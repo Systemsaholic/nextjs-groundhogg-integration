@@ -1,14 +1,13 @@
 <?php
-/*
+/**
  * Plugin Name: NextJS Groundhogg Integration
  * Plugin URI: https://github.com/Systemsaholic/nextjs-groundhogg-integration
- * Description: Integrates NextJS frontend with WordPress backend and Groundhogg CRM (Beta)
- * Version: 0.1.2-beta
+ * Description: Integrate Groundhogg with NextJS applications
+ * Version: 0.1.3-beta
  * Author: Al Guertin
  * Author URI: https://systemsaholic.com
- * Text Domain: nextjs-groundhogg
- * Domain Path: /languages
- * Beta: true
+ * License: GPL v2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
 if (!defined('ABSPATH')) {
