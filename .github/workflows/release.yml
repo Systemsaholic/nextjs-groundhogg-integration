@@ -21,15 +21,6 @@ jobs:
         run: |
           zip -r nextjs-groundhogg-integration-${{ steps.get_version.outputs.VERSION }}.zip . -x ".git/*" ".github/*" ".gitignore"
 
-      - name: Read plugin.json
-        id: plugin_json
-        run: |
-          content=`cat plugin.json`
-          content="${content//'%'/'%25'}"
-          content="${content//$'\n'/'%0A'}"
-          content="${content//$'\r'/'%0D'}"
-          echo "PLUGIN_JSON=$content" >> $GITHUB_OUTPUT
-
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -39,7 +30,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: NextJS Groundhogg Integration ${{ steps.get_version.outputs.VERSION }}
           body: |
-            ${{ fromJson(steps.plugin_json.outputs.PLUGIN_JSON).sections.changelog }}
+            Release ${{ steps.get_version.outputs.VERSION }}
           draft: false
           prerelease: ${{ contains(github.ref, '-beta') }}
 
