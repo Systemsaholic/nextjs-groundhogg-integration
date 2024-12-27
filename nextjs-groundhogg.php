@@ -3,7 +3,7 @@
  * Plugin Name: NextJS Groundhogg Integration
  * Plugin URI: https://github.com/Systemsaholic/nextjs-groundhogg-integration
  * Description: Integrate Groundhogg with NextJS applications
- * Version: 0.1.3-beta
+ * Version: 0.1.1-beta
  * Author: Al Guertin
  * Author URI: https://systemsaholic.com
  * License: GPL v2 or later
@@ -24,12 +24,6 @@ if (!class_exists('Puc_v4_Factory')) {
         __FILE__,
         'nextjs-groundhogg-integration'
     );
-
-    // Optional: Set authentication for private repos
-    $github_token = get_option('nextjs_gh_github_token');
-    if (!empty($github_token)) {
-        $myUpdateChecker->setAuthentication($github_token);
-    }
 }
 
 class NextJS_Groundhogg_Integration {

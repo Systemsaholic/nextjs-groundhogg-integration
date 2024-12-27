@@ -1,6 +1,11 @@
 {
   "name": "NextJS Groundhogg Integration",
   "version": "0.1.3-beta",
+  "download_url": "https://github.com/Systemsaholic/nextjs-groundhogg-integration/releases/download/0.1.3-beta/nextjs-groundhogg-integration-0.1.3-beta.zip",
+  "requires": "5.0",
+  "tested": "6.4",
+  "requires_php": "7.4",
+  "last_updated": "2024-01-22",
   "sections": {
     "description": "Integrate Groundhogg with NextJS applications for seamless contact management and automation.",
     "changelog": "= 0.1.3-beta =\n* Added GitHub Actions workflow for automated releases\n\n= 0.1.2-beta =\n* Fixed update checker configuration\n* Added automated release workflow\n\n= 0.1.1-beta =\n* Initial beta release\n* Basic Groundhogg integration features"
