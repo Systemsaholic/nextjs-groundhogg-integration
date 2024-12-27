@@ -1,0 +1,8 @@
+{
+  "name": "NextJS Groundhogg Integration",
+  "version": "0.1.2-beta",
+  "sections": {
+    "description": "Integrate Groundhogg with NextJS applications for seamless contact management and automation.",
+    "changelog": "= 0.1.2-beta =\n* Fixed update checker configuration\n* Added automated release workflow\n\n= 0.1.1-beta =\n* Initial beta release\n* Basic Groundhogg integration features"
+  }
+}

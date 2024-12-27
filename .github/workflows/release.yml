@@ -1,0 +1,54 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - '*-beta'
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create zip file
+        run: |
+          zip -r nextjs-groundhogg-integration-${{ steps.get_version.outputs.VERSION }}.zip . -x ".git/*" ".github/*" ".gitignore"
+
+      - name: Read plugin.json
+        id: plugin_json
+        run: |
+          content=`cat plugin.json`
+          content="${content//'%'/'%25'}"
+          content="${content//$'\n'/'%0A'}"
+          content="${content//$'\r'/'%0D'}"
+          echo "PLUGIN_JSON=$content" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: NextJS Groundhogg Integration ${{ steps.get_version.outputs.VERSION }}
+          body: |
+            ${{ fromJson(steps.plugin_json.outputs.PLUGIN_JSON).sections.changelog }}
+          draft: false
+          prerelease: ${{ contains(github.ref, '-beta') }}
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./nextjs-groundhogg-integration-${{ steps.get_version.outputs.VERSION }}.zip
+          asset_name: nextjs-groundhogg-integration-${{ steps.get_version.outputs.VERSION }}.zip
+          asset_content_type: application/zip 

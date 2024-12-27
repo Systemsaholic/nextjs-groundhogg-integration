@@ -1,17 +1,36 @@
 <?php
 /*
  * Plugin Name: NextJS Groundhogg Integration
- * Plugin URI: https://github.com/yourusername/wordpress-nextjs-groundhogg
- * Description: Integrates NextJS frontend with WordPress backend and Groundhogg CRM
- * Version: 1.0.0
+ * Plugin URI: https://github.com/Systemsaholic/nextjs-groundhogg-integration
+ * Description: Integrates NextJS frontend with WordPress backend and Groundhogg CRM (Beta)
+ * Version: 0.1.2-beta
  * Author: Al Guertin
  * Author URI: https://systemsaholic.com
  * Text Domain: nextjs-groundhogg
  * Domain Path: /languages
+ * Beta: true
  */
 
 if (!defined('ABSPATH')) {
     exit;
+}
+
+// Plugin update checker
+if (!class_exists('Puc_v4_Factory')) {
+    require_once plugin_dir_path(__FILE__) . 'includes/plugin-update-checker/plugin-update-checker.php';
+    
+    // Set up the update checker
+    $myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
+        'https://raw.githubusercontent.com/Systemsaholic/nextjs-groundhogg-integration/master/plugin.json',
+        __FILE__,
+        'nextjs-groundhogg-integration'
+    );
+
+    // Optional: Set authentication for private repos
+    $github_token = get_option('nextjs_gh_github_token');
+    if (!empty($github_token)) {
+        $myUpdateChecker->setAuthentication($github_token);
+    }
 }
 
 class NextJS_Groundhogg_Integration {
@@ -25,6 +44,11 @@ class NextJS_Groundhogg_Integration {
     }
 
     public function __construct() {
+        // Only initialize if Groundhogg is active
+        if (!$this->check_groundhogg()) {
+            return;
+        }
+
         add_action('init', [$this, 'init']);
         add_action('admin_init', [$this, 'admin_init']);
         // Add AJAX handlers
@@ -67,18 +91,22 @@ class NextJS_Groundhogg_Integration {
         add_action('groundhogg/email/clicked', [$this, 'handle_email_clicked'], 10, 3);
     }
 
-    public function init() {
-        // Enable error reporting for debugging
-        error_reporting(E_ALL);
-        ini_set('display_errors', 1);
-        
-        try {
-        // Check if Groundhogg is active
+    private function check_groundhogg() {
         if (!class_exists('\Groundhogg\Plugin')) {
-            add_action('admin_notices', [$this, 'groundhogg_missing_notice']);
-            return;
+            add_action('admin_notices', function() {
+                ?>
+                <div class="notice notice-error">
+                    <p><?php _e('NextJS Groundhogg Integration requires Groundhogg CRM plugin to be installed and activated.', 'nextjs-groundhogg'); ?></p>
+                </div>
+                <?php
+            });
+            return false;
         }
+        return true;
+    }
 
+    public function init() {
+        try {
             // Initialize API
             if (file_exists(plugin_dir_path(__FILE__) . 'includes/api.php')) {
                 require_once plugin_dir_path(__FILE__) . 'includes/api.php';
@@ -87,13 +115,10 @@ class NextJS_Groundhogg_Integration {
                 throw new Exception('API file not found');
             }
 
-        // Add CORS support
-        add_action('rest_api_init', [$this, 'add_cors_support'], 15);
+            // Add CORS support
+            add_action('rest_api_init', [$this, 'add_cors_support'], 15);
         } catch (Exception $e) {
-            // Log the error
             error_log('NextJS Groundhogg Integration Error: ' . $e->getMessage());
-            
-            // Add admin notice
             add_action('admin_notices', function() use ($e) {
                 ?>
                 <div class="notice notice-error">
@@ -106,14 +131,6 @@ class NextJS_Groundhogg_Integration {
 
     public function admin_init() {
         $this->register_settings();
-    }
-
-    public function groundhogg_missing_notice() {
-        ?>
-        <div class="notice notice-error">
-            <p><?php _e('NextJS Groundhogg Integration requires Groundhogg CRM plugin to be installed and activated.', 'nextjs-groundhogg'); ?></p>
-        </div>
-        <?php
     }
 
     public function add_cors_support() {
